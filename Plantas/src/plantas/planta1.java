@@ -8,6 +8,8 @@ public class planta1 extends JFrame{
     private JButton button1;
     private JLabel nombre;
     private JPanel mainPanel;
+    private JCheckBox checkBox1;
+    private JCheckBox checkBox2;
 
     public planta1() {
         setContentPane(mainPanel);
