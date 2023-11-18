@@ -21,9 +21,9 @@ public class Conexion {
         ResultSet rs;
         try {
             st=cn.con.createStatement();
-            rs=st.executeQuery("select * from tipo_planilla1");
+            rs=st.executeQuery("select * from marcas1");
             while (rs.next()) {
-                System.out.println(rs.getInt("id")+" " +rs.getString("nombre"));
+                System.out.println(rs.getInt("id_empleado")+" " +rs.getString("fecha")+ " " +rs.getString("hora_entrada")+" " +rs.getString("hora_salida") );
             }
             cn.con.close();
         } catch (Exception e) {
