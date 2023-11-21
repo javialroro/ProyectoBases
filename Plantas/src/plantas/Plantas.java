@@ -15,8 +15,8 @@ public class Plantas {
      */
     public static void main(String[] args) {
         planta1 p1 =new planta1();
-        planta2 p2 =new planta2();
-        planta3 p3 =new planta3();
+        //planta2 p2 =new planta2();
+        //planta3 p3 =new planta3();
         
         // TODO code application logic here
     }
