@@ -14,7 +14,8 @@ public class Plantas {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        planta1 p1 =new planta1();
+        //planta1 p1 =new planta1();
+        simulacionMarcas s1 = new simulacionMarcas();
         //planta2 p2 =new planta2();
         //planta3 p3 =new planta3();
         
