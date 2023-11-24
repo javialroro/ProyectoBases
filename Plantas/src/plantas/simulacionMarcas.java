@@ -5,7 +5,6 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.concurrent.ThreadLocalRandom;
 import javax.swing.*;
 import java.util.Random;
 import java.util.ArrayList;
@@ -13,15 +12,16 @@ import java.util.List;
 
 public class simulacionMarcas {
 
-    private JTextField JtextId1;
-    private JComboBox elegirCalendarios;
-    private JButton iniciarSimulaciónButton;
-    private JPanel mainPanel;
+    private  JTextField JtextId1;
+    private  JComboBox elegirCalendarios;
+    private   JButton iniciarSimulaciónButton;
+    private  JPanel mainPanel;
     private JTextField textField1;
-    private JComboBox comboBox1;
-    private JTextField textField2;
-    private JTextField textField3;
-    private JTextField textField4;
+    private  JComboBox comboBox1;
+    private  JTextField textField2;
+    private  JTextField textField3;
+    private  JTextField textField4;
+    private JButton pararSimulaciónButton;
 
     public simulacionMarcas() {
         JFrame frame = new JFrame("simulacionMarcas");
@@ -29,16 +29,39 @@ public class simulacionMarcas {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
+        final boolean[] ejecutar = {true};
+        pararSimulaciónButton.setEnabled(false);
+        Thread miHilo = new Thread(() -> {
+            while (ejecutar[0]) {
+                simularMarcas();
+                try {
+                    Thread.sleep(5000); // Pausa el hilo durante 5 segundos
+                } catch (InterruptedException e2) {
+                    e2.printStackTrace();
+                }
+            }});
 
         iniciarSimulaciónButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                simularMarcas();
+
+                miHilo.start();
+                iniciarSimulaciónButton.setEnabled(false);
+                pararSimulaciónButton.setEnabled(true);
+            }
+        });
+
+        pararSimulaciónButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ejecutar[0] = false;
+                iniciarSimulaciónButton.setEnabled(true);
+                pararSimulaciónButton.setEnabled(false);
             }
         });
     }
 
-    public void simularMarcas() {
+    public  void simularMarcas() {
         Conexion conexion = new Conexion();
 
         String fechaInicioStr = JtextId1.getText();
@@ -49,144 +72,130 @@ public class simulacionMarcas {
         String cal = elegirCalendarios.getSelectedItem().toString();
         String modo = comboBox1.getSelectedItem().toString();
 
-        try {
+            try {
+
+                if (cal.equals("Cal1")) {
 
 
-            if (cal.equals("Cal1")) {
+                    Connection con = conexion.con;
+                    Statement st = con.createStatement();
+                    String consulta = "SELECT * FROM empleados1 WHERE TIPO = 1";
+                    ResultSet rs = st.executeQuery(consulta);
+                    List<Integer> listaempleados = new ArrayList<>();
+                    while (rs.next()) {
+                        listaempleados.add(rs.getInt("id"));
+                    }
+
+                    // EMPLEADO QUE MARCARÁ
+                    int empleadoAleatorio = obtenerEmpleadoAleatorio(listaempleados);
 
 
-                Connection con = conexion.con;
-                Statement st = con.createStatement();
-                String consulta = "SELECT * FROM empleados1 WHERE TIPO = 1";
-                ResultSet rs = st.executeQuery(consulta);
-                List<Integer> listaempleados = new ArrayList<>();
-                while (rs.next()) {
-                    listaempleados.add(rs.getInt("id"));
-                }
+                    // FECHA EN LA QUE SE GENERARÁ LA MARCA
+                    String fechaAleatoria = generarFechaAleatoria(fechaInicioStr, fechaFinStr);
 
-                // EMPLEADO QUE MARCARÁ
-                int empleadoAleatorio = obtenerEmpleadoAleatorio(listaempleados);
+                    // HORAS DE ENTRADA Y SALIDA
+                    String horaEntrada = "07:00:00";
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+                    LocalTime horaE = LocalTime.parse(horaEntrada, formatter);
+                    int horaEInt = horaE.getHour();
 
+                    String horaSalida = "16:00:00";
+                    LocalTime horaS = LocalTime.parse(horaSalida, formatter);
+                    int horaSInt = horaS.getHour();
 
-                // FECHA EN LA QUE SE GENERARÁ LA MARCA
-                String fechaAleatoria = generarFechaAleatoria(fechaInicioStr, fechaFinStr);
-
-                // HORAS DE ENTRADA Y SALIDA
-                String horaEntrada = "07:00:00";
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-                LocalTime horaE = LocalTime.parse(horaEntrada, formatter);
-                int horaEInt = horaE.getHour();
-
-                String horaSalida = "16:00:00";
-                LocalTime horaS = LocalTime.parse(horaSalida, formatter);
-                int horaSInt = horaS.getHour();
-
-                Statement stec = con.createStatement();
-                String empleadoCiclo = "SELECT * FROM empleados1 WHERE id = " + empleadoAleatorio;
-                ResultSet rsec = stec.executeQuery(empleadoCiclo);
-                System.out.println("-----------------------------------------------------------------------------------");
-                if (rsec.next()) {
-                    if (probabilidad(ausentismo)) {
-                        System.out.println("El empleado/a " + rsec.getString("nombre") + " no asistió");
-
-                    } else {
-                        System.out.println("El empleado/a " + rsec.getString("nombre") + " asistió");
-
-                        if (probabilidad(tardías)) {
-                            System.out.println("El empleado/a " + rsec.getString("nombre") + " llegó tarde");
-                            Random randht = new Random();
-                            int horasTarde = randht.nextInt((3 - 1) + 1) + 1;
-                            int horaETInt = horaEInt + horasTarde;
-                            String horaET = horaETInt + ":00:00";
-                            System.out.println("Hora de entrada: " + horaET);
-
-                            try (CallableStatement cst = con.prepareCall("{CALL planta1.`MARCAR ENTRADA`(?, ?, ?)}")) {
-                                cst.setInt(1, Integer.parseInt(rsec.getString("id")));
-                                cst.setDate(2, java.sql.Date.valueOf(fechaAleatoria));
-                                cst.setTime(3, java.sql.Time.valueOf(horaET));
-
-                                cst.execute();
-                                JOptionPane.showMessageDialog(null, "Entrada marcada correctamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-
-                                // No need to retrieve results as the stored procedure doesn't return a ResultSet.
-                            } catch (SQLException | NumberFormatException e) {
-                                JOptionPane.showMessageDialog(null, "Error al marcar la entrada: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                                System.out.println("Error: " + e);
-                            }
-
-
+                    Statement stec = con.createStatement();
+                    String empleadoCiclo = "SELECT * FROM empleados1 WHERE id = " + empleadoAleatorio;
+                    ResultSet rsec = stec.executeQuery(empleadoCiclo);
+                    System.out.println("-----------------------------------------------------------------------------------");
+                    if (rsec.next()) {
+                        if (probabilidad(ausentismo)) {
+                            System.out.println("El empleado/a " + rsec.getString("nombre") + " no asistió");
 
                         } else {
-                            System.out.println("El empleado/a " + rsec.getString("nombre") + " llegó a tiempo");
+                            System.out.println("El empleado/a " + rsec.getString("nombre") + " asistió");
 
-                            try (CallableStatement cst = con.prepareCall("{CALL planta1.`MARCAR ENTRADA`(?, ?, ?)}")) {
-                                cst.setInt(1, Integer.parseInt(rsec.getString("id")));
-                                cst.setDate(2, java.sql.Date.valueOf(fechaAleatoria));
-                                cst.setTime(3, java.sql.Time.valueOf(horaEntrada));
+                            if (probabilidad(tardías)) {
+                                System.out.println("El empleado/a " + rsec.getString("nombre") + " llegó tarde");
+                                Random randht = new Random();
+                                int horasTarde = randht.nextInt((3 - 1) + 1) + 1;
+                                int horaETInt = horaEInt + horasTarde;
+                                String horaET = horaETInt + ":00:00";
+                                System.out.println("Hora de entrada: " + horaET);
 
-                                cst.execute();
-                                JOptionPane.showMessageDialog(null, "Entrada marcada correctamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                                try (CallableStatement cst = con.prepareCall("{CALL planta1.`MARCAR ENTRADA`(?, ?, ?)}")) {
+                                    cst.setInt(1, Integer.parseInt(rsec.getString("id")));
+                                    cst.setDate(2, java.sql.Date.valueOf(fechaAleatoria));
+                                    cst.setTime(3, java.sql.Time.valueOf(horaET));
 
-                                // No need to retrieve results as the stored procedure doesn't return a ResultSet.
-                            } catch (SQLException | NumberFormatException e) {
-                                JOptionPane.showMessageDialog(null, "Error al marcar la entrada: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                                System.out.println("Error: " + e);
+                                    cst.execute();
+                                    //JOptionPane.showMessageDialog(null, "Entrada marcada correctamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+
+                                    // No need to retrieve results as the stored procedure doesn't return a ResultSet.
+                                } catch (SQLException | NumberFormatException e) {
+                                    JOptionPane.showMessageDialog(null, "Error al marcar la entrada: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                                    System.out.println("Error: " + e);
+                                }
+
+
+                            } else {
+                                System.out.println("El empleado/a " + rsec.getString("nombre") + " llegó a tiempo");
+
+                                try (CallableStatement cst = con.prepareCall("{CALL planta1.`MARCAR ENTRADA`(?, ?, ?)}")) {
+                                    cst.setInt(1, Integer.parseInt(rsec.getString("id")));
+                                    cst.setDate(2, java.sql.Date.valueOf(fechaAleatoria));
+                                    cst.setTime(3, java.sql.Time.valueOf(horaEntrada));
+
+                                    cst.execute();
+                                    //JOptionPane.showMessageDialog(null, "Entrada marcada correctamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+
+                                    // No need to retrieve results as the stored procedure doesn't return a ResultSet.
+                                } catch (SQLException | NumberFormatException e) {
+                                    JOptionPane.showMessageDialog(null, "Error al marcar la entrada: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                                    System.out.println("Error: " + e);
+                                }
+
+
                             }
 
+                            if (probabilidad(omision)) {
+                                System.out.println("El empleado/a " + rsec.getString("nombre") + " olvidó marcar salida");
+
+                            } else {
+                                System.out.println("El empleado/a " + rsec.getString("nombre") + " marcó salida");
+                                try (CallableStatement cst = con.prepareCall("{CALL planta1.`MARCAR_SALIDA`(?, ?, ?)}")) {
+                                    cst.setInt(1, Integer.parseInt(rsec.getString("id")));
+                                    cst.setDate(2, java.sql.Date.valueOf(fechaAleatoria));
+                                    cst.setTime(3, java.sql.Time.valueOf(horaSalida));
+
+                                    boolean hasResultSet = cst.execute();
+
+                                    if (hasResultSet) {
+                                        ResultSet rss = cst.getResultSet();
+                                        if (rss.next()) {
+                                            // Check the result from the stored procedure
+                                            String resultMessage = rs.getString(1);
+                                            JOptionPane.showMessageDialog(null, resultMessage);
+                                        }
+                                    } else {
+                                        //JOptionPane.showMessageDialog(null, "Salida marcada con éxito.");
+                                    }
+
+                                } catch (SQLException | NumberFormatException e) {
+                                    // Show an error message
+                                    JOptionPane.showMessageDialog(null, "Error al marcar la salida: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                                    System.out.println("Error: " + e);
+                                }
+
+
+                            }
 
                         }
 
-                        if (probabilidad(omision)) {
-                            System.out.println("El empleado/a " + rsec.getString("nombre") + " olvidó marcar salida");
-
-                        } else {
-                            System.out.println("El empleado/a " + rsec.getString("nombre") + " marcó salida");
-                            try (CallableStatement cst = con.prepareCall("{CALL planta1.`MARCAR_SALIDA`(?, ?, ?)}")) {
-                                cst.setInt(1, Integer.parseInt(rsec.getString("id")));
-                                cst.setDate(2, java.sql.Date.valueOf(fechaAleatoria));
-                                cst.setTime(3, java.sql.Time.valueOf(horaSalida));
-
-                                boolean hasResultSet = cst.execute();
-
-                                if (hasResultSet) {
-                                    ResultSet rss = cst.getResultSet();
-                                    if (rss.next()) {
-                                        // Check the result from the stored procedure
-                                        String resultMessage = rs.getString(1);
-                                        JOptionPane.showMessageDialog(null, resultMessage);
-                                    }
-                                } else {
-                                    JOptionPane.showMessageDialog(null, "Salida marcada con éxito.");
-                                }
-
-                            } catch (SQLException | NumberFormatException e) {
-                                // Show an error message
-                                JOptionPane.showMessageDialog(null, "Error al marcar la salida: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                                System.out.println("Error: " + e);
-                            } finally {
-                                try {
-                                    if (con != null) {
-                                        con.close();
-                                    }
-                                } catch (SQLException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-
-
-                        }
 
                     }
 
-
-                }
-
-                System.out.println("-----------------------------------------------------------------------------------");
-            }
-
-
-
-            else if(cal.equals("Cal2")){
+                    System.out.println("-----------------------------------------------------------------------------------");
+                } else if (cal.equals("Cal2")) {
 
                     Connection con = conexion.con;
                     Statement st = con.createStatement();
@@ -239,14 +248,13 @@ public class simulacionMarcas {
                                     cst.setTime(3, java.sql.Time.valueOf(horaET));
 
                                     cst.execute();
-                                    JOptionPane.showMessageDialog(null, "Entrada marcada correctamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                                    //JOptionPane.showMessageDialog(null, "Entrada marcada correctamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
 
                                     // No need to retrieve results as the stored procedure doesn't return a ResultSet.
                                 } catch (SQLException | NumberFormatException e) {
                                     JOptionPane.showMessageDialog(null, "Error al marcar la entrada: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                                     System.out.println("Error: " + e);
                                 }
-
 
 
                             } else {
@@ -258,7 +266,7 @@ public class simulacionMarcas {
                                     cst.setTime(3, java.sql.Time.valueOf(horaEntrada));
 
                                     cst.execute();
-                                    JOptionPane.showMessageDialog(null, "Entrada marcada correctamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                                    //JOptionPane.showMessageDialog(null, "Entrada marcada correctamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
 
                                     // No need to retrieve results as the stored procedure doesn't return a ResultSet.
                                 } catch (SQLException | NumberFormatException e) {
@@ -289,23 +297,14 @@ public class simulacionMarcas {
                                             JOptionPane.showMessageDialog(null, resultMessage);
                                         }
                                     } else {
-                                        JOptionPane.showMessageDialog(null, "Salida marcada con éxito.");
+                                        //JOptionPane.showMessageDialog(null, "Salida marcada con éxito.");
                                     }
 
                                 } catch (SQLException | NumberFormatException e) {
                                     // Show an error message
                                     JOptionPane.showMessageDialog(null, "Error al marcar la salida: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                                     System.out.println("Error: " + e);
-                                } finally {
-                                    try {
-                                        if (con != null) {
-                                            con.close();
-                                        }
-                                    } catch (SQLException e) {
-                                        e.printStackTrace();
-                                    }
                                 }
-
 
                             }
 
@@ -315,10 +314,7 @@ public class simulacionMarcas {
                     }
 
                     System.out.println("-----------------------------------------------------------------------------------");
-                }
-
-
-            else if(cal.equals("Cal3")){
+                } else if (cal.equals("Cal3")) {
                     Connection con = conexion.con;
                     Statement st = con.createStatement();
                     String consulta = "SELECT * FROM empleados1 WHERE TIPO = 3";
@@ -370,14 +366,13 @@ public class simulacionMarcas {
                                     cst.setTime(3, java.sql.Time.valueOf(horaET));
 
                                     cst.execute();
-                                    JOptionPane.showMessageDialog(null, "Entrada marcada correctamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                                    //JOptionPane.showMessageDialog(null, "Entrada marcada correctamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
 
                                     // No need to retrieve results as the stored procedure doesn't return a ResultSet.
                                 } catch (SQLException | NumberFormatException e) {
                                     JOptionPane.showMessageDialog(null, "Error al marcar la entrada: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                                     System.out.println("Error: " + e);
                                 }
-
 
 
                             } else {
@@ -389,7 +384,7 @@ public class simulacionMarcas {
                                     cst.setTime(3, java.sql.Time.valueOf(horaEntrada));
 
                                     cst.execute();
-                                    JOptionPane.showMessageDialog(null, "Entrada marcada correctamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                                    //JOptionPane.showMessageDialog(null, "Entrada marcada correctamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
 
                                     // No need to retrieve results as the stored procedure doesn't return a ResultSet.
                                 } catch (SQLException | NumberFormatException e) {
@@ -420,21 +415,13 @@ public class simulacionMarcas {
                                             JOptionPane.showMessageDialog(null, resultMessage);
                                         }
                                     } else {
-                                        JOptionPane.showMessageDialog(null, "Salida marcada con éxito.");
+                                        //JOptionPane.showMessageDialog(null, "Salida marcada con éxito.");
                                     }
 
                                 } catch (SQLException | NumberFormatException e) {
                                     // Show an error message
                                     JOptionPane.showMessageDialog(null, "Error al marcar la salida: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                                     System.out.println("Error: " + e);
-                                } finally {
-                                    try {
-                                        if (con != null) {
-                                            con.close();
-                                        }
-                                    } catch (SQLException e) {
-                                        e.printStackTrace();
-                                    }
                                 }
 
 
@@ -446,10 +433,7 @@ public class simulacionMarcas {
                     }
 
                     System.out.println("-----------------------------------------------------------------------------------");
-                }
-
-
-            else if(cal.equals("Cal4y5")){
+                } else if (cal.equals("Cal4y5")) {
                     Connection con = conexion.con;
                     Statement st = con.createStatement();
                     String consulta = "SELECT * FROM empleados1 WHERE TIPO = 4 OR TIPO = 5";
@@ -501,14 +485,13 @@ public class simulacionMarcas {
                                     cst.setTime(3, java.sql.Time.valueOf(horaET));
 
                                     cst.execute();
-                                    JOptionPane.showMessageDialog(null, "Entrada marcada correctamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                                    //JOptionPane.showMessageDialog(null, "Entrada marcada correctamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
 
                                     // No need to retrieve results as the stored procedure doesn't return a ResultSet.
                                 } catch (SQLException | NumberFormatException e) {
                                     JOptionPane.showMessageDialog(null, "Error al marcar la entrada: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                                     System.out.println("Error: " + e);
                                 }
-
 
 
                             } else {
@@ -520,7 +503,7 @@ public class simulacionMarcas {
                                     cst.setTime(3, java.sql.Time.valueOf(horaEntrada));
 
                                     cst.execute();
-                                    JOptionPane.showMessageDialog(null, "Entrada marcada correctamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                                    //JOptionPane.showMessageDialog(null, "Entrada marcada correctamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
 
                                     // No need to retrieve results as the stored procedure doesn't return a ResultSet.
                                 } catch (SQLException | NumberFormatException e) {
@@ -551,21 +534,133 @@ public class simulacionMarcas {
                                             JOptionPane.showMessageDialog(null, resultMessage);
                                         }
                                     } else {
-                                        JOptionPane.showMessageDialog(null, "Salida marcada con éxito.");
+                                        //JOptionPane.showMessageDialog(null, "Salida marcada con éxito.");
                                     }
 
                                 } catch (SQLException | NumberFormatException e) {
                                     // Show an error message
                                     JOptionPane.showMessageDialog(null, "Error al marcar la salida: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                                     System.out.println("Error: " + e);
-                                } finally {
-                                    try {
-                                        if (con != null) {
-                                            con.close();
+                                }
+
+
+                            }
+
+                        }
+
+
+                    }
+
+                    System.out.println("-----------------------------------------------------------------------------------");
+                } else {
+
+                    Connection con = conexion.con;
+                    Statement st = con.createStatement();
+                    String consulta = "SELECT * FROM empleados1";
+                    ResultSet rs = st.executeQuery(consulta);
+                    List<Integer> listaempleados = new ArrayList<>();
+                    while (rs.next()) {
+                        listaempleados.add(rs.getInt("id"));
+                    }
+
+                    // EMPLEADO QUE MARCARÁ
+                    int empleadoAleatorio = obtenerEmpleadoAleatorio(listaempleados);
+
+
+                    // FECHA EN LA QUE SE GENERARÁ LA MARCA
+                    String fechaAleatoria = generarFechaAleatoria(fechaInicioStr, fechaFinStr);
+
+                    // HORAS DE ENTRADA Y SALIDA
+                    String horaEntrada = "07:00:00";
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+                    LocalTime horaE = LocalTime.parse(horaEntrada, formatter);
+                    int horaEInt = horaE.getHour();
+
+                    String horaSalida = "16:00:00";
+                    LocalTime horaS = LocalTime.parse(horaSalida, formatter);
+                    int horaSInt = horaS.getHour();
+
+                    Statement stec = con.createStatement();
+                    String empleadoCiclo = "SELECT * FROM empleados1 WHERE id = " + empleadoAleatorio;
+                    ResultSet rsec = stec.executeQuery(empleadoCiclo);
+                    System.out.println("-----------------------------------------------------------------------------------");
+                    if (rsec.next()) {
+                        if (probabilidad(ausentismo)) {
+                            System.out.println("El empleado/a " + rsec.getString("nombre") + " no asistió");
+
+                        } else {
+                            System.out.println("El empleado/a " + rsec.getString("nombre") + " asistió");
+
+                            if (probabilidad(tardías)) {
+                                System.out.println("El empleado/a " + rsec.getString("nombre") + " llegó tarde");
+                                Random randht = new Random();
+                                int horasTarde = randht.nextInt((3 - 1) + 1) + 1;
+                                int horaETInt = horaEInt + horasTarde;
+                                String horaET = horaETInt + ":00:00";
+                                System.out.println("Hora de entrada: " + horaET);
+
+                                try (CallableStatement cst = con.prepareCall("{CALL planta1.`MARCAR ENTRADA`(?, ?, ?)}")) {
+                                    cst.setInt(1, Integer.parseInt(rsec.getString("id")));
+                                    cst.setDate(2, java.sql.Date.valueOf(fechaAleatoria));
+                                    cst.setTime(3, java.sql.Time.valueOf(horaET));
+
+                                    cst.execute();
+                                   // JOptionPane.showMessageDialog(null, "Entrada marcada correctamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+
+                                    // No need to retrieve results as the stored procedure doesn't return a ResultSet.
+                                } catch (SQLException | NumberFormatException e) {
+                                    JOptionPane.showMessageDialog(null, "Error al marcar la entrada: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                                    System.out.println("Error: " + e);
+                                }
+
+
+                            } else {
+                                System.out.println("El empleado/a " + rsec.getString("nombre") + " llegó a tiempo");
+
+                                try (CallableStatement cst = con.prepareCall("{CALL planta1.`MARCAR ENTRADA`(?, ?, ?)}")) {
+                                    cst.setInt(1, Integer.parseInt(rsec.getString("id")));
+                                    cst.setDate(2, java.sql.Date.valueOf(fechaAleatoria));
+                                    cst.setTime(3, java.sql.Time.valueOf(horaEntrada));
+
+                                    cst.execute();
+                                    //JOptionPane.showMessageDialog(null, "Entrada marcada correctamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+
+                                    // No need to retrieve results as the stored procedure doesn't return a ResultSet.
+                                } catch (SQLException | NumberFormatException e) {
+                                    JOptionPane.showMessageDialog(null, "Error al marcar la entrada: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                                    System.out.println("Error: " + e);
+                                }
+
+
+                            }
+
+                            if (probabilidad(omision)) {
+                                System.out.println("El empleado/a " + rsec.getString("nombre") + " olvidó marcar salida");
+
+                            } else {
+                                System.out.println("El empleado/a " + rsec.getString("nombre") + " marcó salida");
+                                try (CallableStatement cst = con.prepareCall("{CALL planta1.`MARCAR_SALIDA`(?, ?, ?)}")) {
+                                    cst.setInt(1, Integer.parseInt(rsec.getString("id")));
+                                    cst.setDate(2, java.sql.Date.valueOf(fechaAleatoria));
+                                    cst.setTime(3, java.sql.Time.valueOf(horaSalida));
+
+                                    boolean hasResultSet = cst.execute();
+
+                                    if (hasResultSet) {
+                                        ResultSet rss = cst.getResultSet();
+                                        if (rss.next()) {
+                                            // Check the result from the stored procedure
+                                            String resultMessage = rs.getString(1);
+                                            JOptionPane.showMessageDialog(null, resultMessage);
                                         }
-                                    } catch (SQLException e) {
-                                        e.printStackTrace();
+                                    } else {
+                                       // JOptionPane.showMessageDialog(null, "Salida marcada con éxito.");
                                     }
+
+                                } catch (SQLException | NumberFormatException e) {
+                                    // Show an error message
+                                    JOptionPane.showMessageDialog(null, "Error al marcar la salida: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                                    System.out.println("Error: " + e);
                                 }
 
 
@@ -579,140 +674,13 @@ public class simulacionMarcas {
                     System.out.println("-----------------------------------------------------------------------------------");
                 }
 
-            else{
-
-                Connection con = conexion.con;
-                Statement st = con.createStatement();
-                String consulta = "SELECT * FROM empleados1";
-                ResultSet rs = st.executeQuery(consulta);
-                List<Integer> listaempleados = new ArrayList<>();
-                while (rs.next()) {
-                    listaempleados.add(rs.getInt("id"));
-                }
-
-                // EMPLEADO QUE MARCARÁ
-                int empleadoAleatorio = obtenerEmpleadoAleatorio(listaempleados);
-
-
-                // FECHA EN LA QUE SE GENERARÁ LA MARCA
-                String fechaAleatoria = generarFechaAleatoria(fechaInicioStr, fechaFinStr);
-
-                // HORAS DE ENTRADA Y SALIDA
-                String horaEntrada = "07:00:00";
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-                LocalTime horaE = LocalTime.parse(horaEntrada, formatter);
-                int horaEInt = horaE.getHour();
-
-                String horaSalida = "16:00:00";
-                LocalTime horaS = LocalTime.parse(horaSalida, formatter);
-                int horaSInt = horaS.getHour();
-
-                Statement stec = con.createStatement();
-                String empleadoCiclo = "SELECT * FROM empleados1 WHERE id = " + empleadoAleatorio;
-                ResultSet rsec = stec.executeQuery(empleadoCiclo);
-                System.out.println("-----------------------------------------------------------------------------------");
-                if (rsec.next()) {
-                    if (probabilidad(ausentismo)) {
-                        System.out.println("El empleado/a " + rsec.getString("nombre") + " no asistió");
-
-                    } else {
-                        System.out.println("El empleado/a " + rsec.getString("nombre") + " asistió");
-
-                        if (probabilidad(tardías)) {
-                            System.out.println("El empleado/a " + rsec.getString("nombre") + " llegó tarde");
-                            Random randht = new Random();
-                            int horasTarde = randht.nextInt((3 - 1) + 1) + 1;
-                            int horaETInt = horaEInt + horasTarde;
-                            String horaET = horaETInt + ":00:00";
-                            System.out.println("Hora de entrada: " + horaET);
-
-                            try (CallableStatement cst = con.prepareCall("{CALL planta1.`MARCAR ENTRADA`(?, ?, ?)}")) {
-                                cst.setInt(1, Integer.parseInt(rsec.getString("id")));
-                                cst.setDate(2, java.sql.Date.valueOf(fechaAleatoria));
-                                cst.setTime(3, java.sql.Time.valueOf(horaET));
-
-                                cst.execute();
-                                JOptionPane.showMessageDialog(null, "Entrada marcada correctamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-
-                                // No need to retrieve results as the stored procedure doesn't return a ResultSet.
-                            } catch (SQLException | NumberFormatException e) {
-                                JOptionPane.showMessageDialog(null, "Error al marcar la entrada: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                                System.out.println("Error: " + e);
-                            }
-
-
-
-                        } else {
-                            System.out.println("El empleado/a " + rsec.getString("nombre") + " llegó a tiempo");
-
-                            try (CallableStatement cst = con.prepareCall("{CALL planta1.`MARCAR ENTRADA`(?, ?, ?)}")) {
-                                cst.setInt(1, Integer.parseInt(rsec.getString("id")));
-                                cst.setDate(2, java.sql.Date.valueOf(fechaAleatoria));
-                                cst.setTime(3, java.sql.Time.valueOf(horaEntrada));
-
-                                cst.execute();
-                                JOptionPane.showMessageDialog(null, "Entrada marcada correctamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-
-                                // No need to retrieve results as the stored procedure doesn't return a ResultSet.
-                            } catch (SQLException | NumberFormatException e) {
-                                JOptionPane.showMessageDialog(null, "Error al marcar la entrada: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                                System.out.println("Error: " + e);
-                            }
-
-
-                        }
-
-                        if (probabilidad(omision)) {
-                            System.out.println("El empleado/a " + rsec.getString("nombre") + " olvidó marcar salida");
-
-                        } else {
-                            System.out.println("El empleado/a " + rsec.getString("nombre") + " marcó salida");
-                            try (CallableStatement cst = con.prepareCall("{CALL planta1.`MARCAR_SALIDA`(?, ?, ?)}")) {
-                                cst.setInt(1, Integer.parseInt(rsec.getString("id")));
-                                cst.setDate(2, java.sql.Date.valueOf(fechaAleatoria));
-                                cst.setTime(3, java.sql.Time.valueOf(horaSalida));
-
-                                boolean hasResultSet = cst.execute();
-
-                                if (hasResultSet) {
-                                    ResultSet rss = cst.getResultSet();
-                                    if (rss.next()) {
-                                        // Check the result from the stored procedure
-                                        String resultMessage = rs.getString(1);
-                                        JOptionPane.showMessageDialog(null, resultMessage);
-                                    }
-                                } else {
-                                    JOptionPane.showMessageDialog(null, "Salida marcada con éxito.");
-                                }
-
-                            } catch (SQLException | NumberFormatException e) {
-                                // Show an error message
-                                JOptionPane.showMessageDialog(null, "Error al marcar la salida: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                                System.out.println("Error: " + e);
-                            } finally {
-                                try {
-                                    if (con != null) {
-                                        con.close();
-                                    }
-                                } catch (SQLException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-
-
-                        }
-
-                    }
-
-
-                }
-
-                System.out.println("-----------------------------------------------------------------------------------");
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+
+
+
 
 
     }
