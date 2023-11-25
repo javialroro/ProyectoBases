@@ -33,6 +33,7 @@ public class planillasManager extends JFrame{
     private JTextField idBorrar;
     private JTextField fechaBorrar;
     private JButton borrarMarcaButton;
+    private JButton borrarPlanillaButton;
     private HashMap<String, Integer> monthMap;
 
     int calendario = 0;
@@ -152,6 +153,7 @@ public class planillasManager extends JFrame{
                 idBorrar.setEnabled(true);
                 fechaBorrar.setEnabled(true);
                 borrarMarcaButton.setEnabled(true);
+
             }
         });
         borrarMarcaButton.addActionListener(new ActionListener() {
@@ -162,6 +164,21 @@ public class planillasManager extends JFrame{
                     return;
                 }
                 borrarMarca();
+            }
+        });
+        borrarPlanillaButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String inputText = JOptionPane.showInputDialog("Ingrese el ID de la planilla a borrar:");
+
+                // Verificar si el usuario hizo clic en "Cancelar" o cerró el cuadro de diálogo
+                if (inputText != null &&  areDigit(inputText)) {
+                    System.out.println("El usuario ingresó: " + inputText);
+                    borrarPlanilla(Integer.parseInt(inputText));
+                } else {
+                    // El usuario hizo clic en "Cancelar" o cerró el cuadro de diálogo
+                    JOptionPane.showMessageDialog(null, "No se ingresó un número válido", "Error", JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
     }
@@ -413,6 +430,32 @@ public class planillasManager extends JFrame{
                 // Puedes manejar errores específicos si es necesario
             }
             JOptionPane.showMessageDialog(null, "Marca borrada correctamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            // Desactivar botones después de la operación
+        } finally {
+            try {
+                if (cn.con != null) {
+                    cn.con.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    void borrarPlanilla(int idPlanilla) {
+        Conexion cn = new Conexion();
+        try {
+            try (PreparedStatement pst = cn.con.prepareStatement("DELETE FROM planta1.planillas WHERE id = ?  ")) {
+                pst.setInt(1, idPlanilla);
+                pst.executeUpdate();
+                PreparedStatement pst2 = cn.con.prepareStatement("DELETE FROM planta1.lineplanillas WHERE idPlanilla = ?  ");
+                pst2.setInt(1, idPlanilla);
+                pst2.executeUpdate();
+            } catch (SQLException | NumberFormatException e) {
+                JOptionPane.showMessageDialog(null, "Error al borrar la planilla: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                // Puedes manejar errores específicos si es necesario
+            }
+            JOptionPane.showMessageDialog(null, "Planilla borrada correctamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
             // Desactivar botones después de la operación
         } finally {
             try {
