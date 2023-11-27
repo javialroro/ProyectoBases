@@ -343,11 +343,11 @@ public class planillasManager extends JFrame{
         int lineNum = 0;
 
         try {
-            try (PreparedStatement pst = cn.con.prepareStatement("INSERT INTO planta1.planillas (id, fechaInicio, fechaFinal, monto) VALUES (?,?, ?, ?)")) {
+            try (PreparedStatement pst = cn.con.prepareStatement("INSERT INTO planta1.planillas (id, fechaInicio, fechaFinal,pagada) VALUES (?,?, ?, ?)")) {
                 pst.setInt(1, idPlanilla);
                 pst.setDate(2, Date.valueOf(fechaInicio));
                 pst.setDate(3, Date.valueOf(fechaFinal));
-                pst.setInt(4, 0);
+                pst.setString(4, "N");
 
 
                 pst.executeUpdate();

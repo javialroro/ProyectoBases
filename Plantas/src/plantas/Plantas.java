@@ -16,7 +16,8 @@ public class Plantas {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        planillasManager p1 = new planillasManager();
+        Corporacion c1 = new Corporacion();
+        //planillasManager p1 = new planillasManager();
         //planta1 p1 =new planta1();
         //simulacionMarcas s1 = new simulacionMarcas();
         //SwingUtilities.invokeLater(() -> new simulacionMarcas());
