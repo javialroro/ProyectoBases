@@ -6,9 +6,9 @@ import java.sql.SQLException;
 
 public class ConexionSQLServer {
     private static final String connectionString =
-            "jdbc:sqlserver://JAVITO:1433;"
+            "jdbc:sqlserver://DESKTOP-6C4FRHV:1433;"
                     + "database=Corporacion;"
-                    + "user=JAVI;"
+                    + "user=xd;"
                     + "password=1234;"
                     + "encrypt=false;"
                     + "trustServerCertificate=false;"
