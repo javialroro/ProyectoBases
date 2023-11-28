@@ -12,6 +12,7 @@ public class Corporacion extends JFrame{
     private JButton Comprobante;
     private JTextArea ComprobanteText;
     private JButton Pagar;
+    private JTextField plantaTF;
 
     public Corporacion() {
         setContentPane(mainPanel);
@@ -23,26 +24,45 @@ public class Corporacion extends JFrame{
         Comprobante.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                getComprobante();
+                if (!plantaTF.getText().equals("1") && !plantaTF.getText().equals("2") && !plantaTF.getText().equals("3")) {
+                    JOptionPane.showMessageDialog(null, "Ingrese una planta válida", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                getComprobante(Integer.parseInt(plantaTF.getText()));
             }
         });
         Pagar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                pagarPlanilla();
+                if (!plantaTF.getText().equals("1") && !plantaTF.getText().equals("2") && !plantaTF.getText().equals("3")) {
+                    JOptionPane.showMessageDialog(null, "Ingrese una planta válida", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                pagarPlanilla(Integer.parseInt(plantaTF.getText()));
             }
         });
     }
 
-    public void getComprobante(){
+    public void getComprobante(int planta){
         String str = "";
         try{
             Connection connection = ConexionSQLServer.getConnection();
             Statement statement = null;
             statement = connection.createStatement();
+            String selectSql = "";
+            switch (planta){
+                case 1:
+                    selectSql = " EXEC GetComprobanteEmpleado ?, ?";
+                    break;
+                case 2:
+                    selectSql = " EXEC GetComprobanteEmpleado2 ?, ?";
+                    break;
+                case 3:
+                    selectSql = " EXEC GetComprobanteEmpleado3 ?, ?";
+                    break;
 
+            }
             // Create and execute a SELECT SQL statement.
-            String selectSql = "EXEC GetComprobanteEmpleado ?, ?";
             PreparedStatement preparedStatement = connection.prepareStatement(selectSql);
 
             // Set parameters for the stored procedure.
@@ -81,14 +101,28 @@ public class Corporacion extends JFrame{
         }
     }
 
-    public void pagarPlanilla(){
+    public void pagarPlanilla(int planta){
         try{
             Connection connection = ConexionSQLServer.getConnection();
             Statement statement = null;
             statement = connection.createStatement();
+            String selectSql = "";
 
             // Create and execute a SELECT SQL statement.
-            String selectSql = " EXEC PagarPlanilla ?";
+            switch (planta){
+                case 1:
+                    selectSql = " EXEC PagarPlanilla ?";
+                    break;
+                case 2:
+                    selectSql = " EXEC PagarPlanilla2 ?";
+                    break;
+                case 3:
+                    selectSql = " EXEC PagarPlanilla3 ?";
+                    break;
+
+            }
+
+
             PreparedStatement preparedStatement = connection.prepareStatement(selectSql);
 
             // Set parameters for the stored procedure.
