@@ -92,7 +92,7 @@ public class simulacionMarcas {
                 String fechaAleatoria = generarFechaAleatoria(fechaInicioStr, fechaFinStr);
 
                 // HORAS DE ENTRADA Y SALIDA
-                String horaEntrada = "07:00:00";
+                String horaEntrada = "08:00:00";
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
                 LocalTime horaE = LocalTime.parse(horaEntrada, formatter);
                 int horaEInt = horaE.getHour();
@@ -214,7 +214,7 @@ public class simulacionMarcas {
                 String fechaAleatoria = generarFechaAleatoria(fechaInicioStr, fechaFinStr);
 
                 // HORAS DE ENTRADA Y SALIDA
-                String horaEntrada = "07:00:00";
+                String horaEntrada = "08:00:00";
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
                 LocalTime horaE = LocalTime.parse(horaEntrada, formatter);
                 int horaEInt = horaE.getHour();
@@ -334,7 +334,7 @@ public class simulacionMarcas {
                 String fechaAleatoria = generarFechaAleatoria(fechaInicioStr, fechaFinStr);
 
                 // HORAS DE ENTRADA Y SALIDA
-                String horaEntrada = "07:00:00";
+                String horaEntrada = "08:00:00";
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
                 LocalTime horaE = LocalTime.parse(horaEntrada, formatter);
                 int horaEInt = horaE.getHour();
@@ -455,7 +455,7 @@ public class simulacionMarcas {
                 String fechaAleatoria = generarFechaAleatoria(fechaInicioStr, fechaFinStr);
 
                 // HORAS DE ENTRADA Y SALIDA
-                String horaEntrada = "07:00:00";
+                String horaEntrada = "08:00:00";
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
                 LocalTime horaE = LocalTime.parse(horaEntrada, formatter);
                 int horaEInt = horaE.getHour();
@@ -577,7 +577,7 @@ public class simulacionMarcas {
                 String fechaAleatoria = generarFechaAleatoria(fechaInicioStr, fechaFinStr);
 
                 // HORAS DE ENTRADA Y SALIDA
-                String horaEntrada = "07:00:00";
+                String horaEntrada = "08:00:00";
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
                 LocalTime horaE = LocalTime.parse(horaEntrada, formatter);
                 int horaEInt = horaE.getHour();
@@ -713,7 +713,7 @@ public class simulacionMarcas {
                     String fechaAleatoria = generarFechaAleatoria(fechaInicioStr, fechaFinStr);
 
                     // HORAS DE ENTRADA Y SALIDA
-                    String horaEntrada = "07:00:00";
+                    String horaEntrada = "08:00:00";
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
                     LocalTime horaE = LocalTime.parse(horaEntrada, formatter);
                     int horaEInt = horaE.getHour();
@@ -786,7 +786,7 @@ public class simulacionMarcas {
                     String fechaAleatoria = generarFechaAleatoria(fechaInicioStr, fechaFinStr);
 
                     // HORAS DE ENTRADA Y SALIDA
-                    String horaEntrada = "07:00:00";
+                    String horaEntrada = "08:00:00";
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
                     LocalTime horaE = LocalTime.parse(horaEntrada, formatter);
                     int horaEInt = horaE.getHour();
@@ -860,7 +860,7 @@ public class simulacionMarcas {
                     String fechaAleatoria = generarFechaAleatoria(fechaInicioStr, fechaFinStr);
 
                     // HORAS DE ENTRADA Y SALIDA
-                    String horaEntrada = "07:00:00";
+                    String horaEntrada = "08:00:00";
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
                     LocalTime horaE = LocalTime.parse(horaEntrada, formatter);
                     int horaEInt = horaE.getHour();
@@ -933,7 +933,7 @@ public class simulacionMarcas {
                     String fechaAleatoria = generarFechaAleatoria(fechaInicioStr, fechaFinStr);
 
                     // HORAS DE ENTRADA Y SALIDA
-                    String horaEntrada = "07:00:00";
+                    String horaEntrada = "08:00:00";
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
                     LocalTime horaE = LocalTime.parse(horaEntrada, formatter);
                     int horaEInt = horaE.getHour();
@@ -1008,7 +1008,7 @@ public class simulacionMarcas {
                     String fechaAleatoria = generarFechaAleatoria(fechaInicioStr, fechaFinStr);
 
                     // HORAS DE ENTRADA Y SALIDA
-                    String horaEntrada = "07:00:00";
+                    String horaEntrada = "08:00:00";
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
                     LocalTime horaE = LocalTime.parse(horaEntrada, formatter);
                     int horaEInt = horaE.getHour();

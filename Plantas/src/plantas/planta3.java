@@ -115,12 +115,6 @@ public class planta3 extends JFrame{
         }
     }
 
-    public void generarArchivoEmpleados(){
 
-
-
-
-
-    }
 
 }
