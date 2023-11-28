@@ -1,0 +1,6 @@
+id	nombre	fecha_ingreso	fecha_salida	tipo	departamento	id_supervisor
+1	Luisa E. Fernández Durán	2019-02-15	null	1	1	1
+2	Daniel Antonio Liranzo	2022-07-03	null	1	1	1
+3	Aryam De Soto Peguero	2019-11-28	null	1	1	1
+4	Rosa Mayra Tejada Acosta	2021-06-10	null	1	1	1
+5	Elias Peguero Acosta	2022-03-22	null	1	1	1
