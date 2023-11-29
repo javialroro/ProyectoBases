@@ -14,7 +14,7 @@ public class planillasArchivo {
             String query1 = "SELECT * FROM planta3.lineplanillas;";
 
 
-            try (Connection  con= DriverManager.getConnection("jdbc:mysql://localhost:3306/planta3","root","1234");
+            try (Connection  con= DriverManager.getConnection("jdbc:mysql://localhost:3306/planta3","root","juliay8g1711");
                  Statement st = con.createStatement();
                  ResultSet rs = st.executeQuery(query1);
                  FileWriter escribir = new FileWriter(archivo1)) {
@@ -46,20 +46,21 @@ public class planillasArchivo {
                 e.printStackTrace();
             }
 
-        try (Connection  con= DriverManager.getConnection("jdbc:mysql://localhost:3306/planta3","root","1234");
+        try (Connection  con= DriverManager.getConnection("jdbc:mysql://localhost:3306/planta3","root","juliay8g1711");
              Statement st = con.createStatement();
              ResultSet rs2 = st.executeQuery(query2);
              FileWriter escribir2 = new FileWriter(archivo2)) {
 
 
-            escribir2.append("id\tfechaInicio\tfechaFinal\tpagada\n");
+            escribir2.append("id\tfechaInicio\tfechaFinal\tpagada\tcalendario\n");
 
 
             while (rs2.next()) {
                 escribir2.append(rs2.getString("id")).append("\t");
                 escribir2.append(rs2.getString("fechaInicio")).append("\t");
                 escribir2.append(rs2.getString("fechaFinal")).append("\t");
-                escribir2.append(rs2.getString("pagada")).append("\n");
+                escribir2.append(rs2.getString("pagada")).append("\t");
+                escribir2.append(rs2.getString("calendario")).append("\n");
 
 
 

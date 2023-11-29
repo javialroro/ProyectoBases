@@ -1,2 +1,2 @@
-id	fechaInicio	fechaFinal	pagada
-1	2023-11-01	2023-11-30	N
+id	fechaInicio	fechaFinal	pagada	calendario
+1	2023-05-01	2023-05-31	N	5
