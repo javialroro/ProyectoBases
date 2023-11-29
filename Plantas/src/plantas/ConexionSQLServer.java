@@ -14,7 +14,7 @@ public class ConexionSQLServer {
                     + "trustServerCertificate=false;"
                     + "loginTimeout=30;";
 
-    private ConexionSQLServer() {
+    ConexionSQLServer() {
     }
 
     public static Connection getConnection(){

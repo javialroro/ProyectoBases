@@ -12,6 +12,7 @@ public class Menu {
     private JPanel mainPanel;
     private JButton enviarPlanillasPorArchivoButton;
     private JButton enviarEmpleadosPorArchivoButton;
+    private JButton crearEmpleadoButton;
 
 
     public Menu(){
@@ -63,6 +64,12 @@ public class Menu {
             public void actionPerformed(ActionEvent e) {
                 planta3EmpleadosArchivo ap3 = new planta3EmpleadosArchivo();
                 ap3.generarArchivoEmpleados();
+            }
+        });
+        crearEmpleadoButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                crearEmpleado ce = new crearEmpleado();
             }
         });
     }
