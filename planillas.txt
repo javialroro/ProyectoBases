@@ -1,3 +1,2 @@
 id	fechaInicio	fechaFinal	pagada
-2	2023-07-10	2023-07-16	N
 1	2023-11-01	2023-11-30	N

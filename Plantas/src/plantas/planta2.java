@@ -22,8 +22,8 @@ public class planta2 extends JFrame{
 
     public planta2() {
         setContentPane(mainPanel);
-        setTitle("Planta 1");
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setTitle("Planta 2");
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setSize(400, 400);
         setLocationRelativeTo(null);
         setVisible(true);

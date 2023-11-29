@@ -17,7 +17,7 @@ public class Corporacion extends JFrame{
     public Corporacion() {
         setContentPane(mainPanel);
         setTitle("Corporacion");
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setSize(1250, 500);
         setVisible(true);
 

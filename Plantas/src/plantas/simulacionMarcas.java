@@ -26,7 +26,7 @@ public class simulacionMarcas {
     public simulacionMarcas() {
         JFrame frame = new JFrame("simulacionMarcas");
         frame.setContentPane(mainPanel);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
         final boolean[] ejecutar = {true};

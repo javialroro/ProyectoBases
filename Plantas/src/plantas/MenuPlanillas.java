@@ -13,7 +13,7 @@ public class MenuPlanillas {
     public MenuPlanillas() {
         JFrame frame = new JFrame("MenuPlanillas");
         frame.setContentPane(mainPanel);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
 

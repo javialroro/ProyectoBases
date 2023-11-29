@@ -13,7 +13,7 @@ public class menuSimulacion {
     public menuSimulacion() {
         JFrame frame = new JFrame("Simulacion");
         frame.setContentPane(mainPanel);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
         simuladorPlanta1Button.addActionListener(new ActionListener() {

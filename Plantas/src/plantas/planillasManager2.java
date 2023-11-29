@@ -128,7 +128,7 @@ public class planillasManager2 extends JFrame{
             }
         });
         setContentPane(mainPanel);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setSize(1000, 1000);
         setVisible(true);
 
@@ -343,11 +343,12 @@ public class planillasManager2 extends JFrame{
         int lineNum = 0;
 
         try {
-            try (PreparedStatement pst = cn.con.prepareStatement("INSERT INTO planta2.planillas (id, fechaInicio, fechaFinal,pagada) VALUES (?,?, ?, ?)")) {
+            try (PreparedStatement pst = cn.con.prepareStatement("INSERT INTO planta2.planillas (id, fechaInicio, fechaFinal,pagada,calendario) VALUES (?,?, ?, ?,?)")) {
                 pst.setInt(1, idPlanilla);
                 pst.setDate(2, Date.valueOf(fechaInicio));
                 pst.setDate(3, Date.valueOf(fechaFinal));
                 pst.setString(4, "N");
+                pst.setInt(5, calendario);
 
 
                 pst.executeUpdate();

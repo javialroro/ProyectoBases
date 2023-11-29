@@ -14,7 +14,7 @@ public class menuMarcas {
     public menuMarcas() {
         JFrame frame = new JFrame("MenuMarcas");
         frame.setContentPane(mainPanel);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
 

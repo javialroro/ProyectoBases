@@ -22,8 +22,8 @@ public class planta3 extends JFrame{
 
     public planta3() {
         setContentPane(mainPanel);
-        setTitle("Planta 1");
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setTitle("Planta 3");
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setSize(400, 400);
         setLocationRelativeTo(null);
         setVisible(true);

@@ -23,7 +23,7 @@ public class planta1 extends JFrame{
     public planta1() {
         setContentPane(mainPanel);
         setTitle("Planta 1");
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setSize(400, 400);
         setLocationRelativeTo(null);
         setVisible(true);
